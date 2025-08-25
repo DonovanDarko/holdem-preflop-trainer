@@ -1,43 +1,19 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hello World - GitHub Pages</title>
-  <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
-    }
-    .container {
-      background: #fff;
-      padding: 2rem 3rem;
-      border-radius: 1rem;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
-      text-align: center;
-    }
-    h1 {
-      font-size: 2.5rem;
-      color: #333;
-    }
-    @media (max-width: 600px) {
-      .container {
-        padding: 1rem 0.5rem;
-      }
-      h1 {
-        font-size: 2rem;
-      }
-    }
-  </style>
+  <title>Preflop Trainer Visual</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Hello World</h1>
+  <h2>Poker Table Visual</h2>
+  <div class="table-container" id="tableContainer">
+    <div class="table"></div>
+    <!-- Seats will be rendered here -->
   </div>
+  <button onclick="moveDealer()" style="margin-top:1rem;padding:0.5rem 1.2rem;font-size:1rem;">Next Dealer</button>
+  <script src="main.js"></script>
 </body>
 </html>
