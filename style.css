@@ -1,7 +1,16 @@
-/* Ensure dealer button is always on top */
-.dealer-btn {
-  z-index: 300;
+.home-table-bg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 380px;
+  height: 560px;
+  border-radius: 38% / 50%;
+  background: radial-gradient(ellipse at 50% 60%, #2e8b57 70%, #14532d 100%);
+  box-shadow: 0 0 40px #0006;
+  z-index: 1;
 }
+
 body {
   display: flex;
   flex-direction: column;
@@ -72,7 +81,6 @@ body {
 }
 .dealer-btn {
   position: absolute;
-  top: -18px;
   left: 50%;
   transform: translateX(-50%);
   background: #ffd600;
