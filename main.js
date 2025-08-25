@@ -14,11 +14,9 @@ let drillPosition = null;
 
 function renderTable() {
   const container = document.getElementById('tableContainer');
-  // Remove old seats, chips, and position labels
-  Array.from(container.getElementsByClassName('seat')).forEach(e => e.remove());
-  Array.from(container.getElementsByClassName('chip')).forEach(e => e.remove());
-  Array.from(container.getElementsByClassName('position-label')).forEach(e => e.remove());
-  Array.from(container.getElementsByClassName('player-cards')).forEach(e => e.remove());
+    const seatsLayer = document.getElementById('seatsLayer') || document.getElementById('tableContainer');
+    // Remove old seats, chips, and position labels
+    Array.from(seatsLayer.querySelectorAll('.seat, .chip, .position-label, .player-cards')).forEach(e => e.remove());
   let playerPosIdx = PLAYER_SEAT;
   let localDealerSeat = dealerSeat;
   if (mode === 'drill' && drillPosition) {
@@ -41,17 +39,20 @@ function renderTable() {
     // Correct formula: rotate so POSITIONS[PLAYER_SEAT] === drillPosition
     localDealerSeat = (PLAYER_SEAT - drillIdx + NUM_SEATS) % NUM_SEATS;
   }
+  // SVG oval params (match ellipse in SVG): cx=190, cy=280, rx=170, ry=250
+  const a = 170; // horizontal radius
+  const b = 250; // vertical radius
+  const centerX = 190;
+  const centerY = 280;
+  const seatWidth = 44;
+  const seatHeight = 44;
   for (let i = 0; i < NUM_SEATS; i++) {
-    // Vertically oriented oval: x = centerX + a * cos(angle), y = centerY + b * sin(angle)
     // Player seat is always at the bottom (angle = Math.PI/2)
     const playerAngle = Math.PI / 2;
     const angle = playerAngle + (2 * Math.PI / NUM_SEATS) * ((i - PLAYER_SEAT + NUM_SEATS) % NUM_SEATS);
-    const a = 170;
-    const b = 280;
-    const centerX = 190;
-    const centerY = 300;
-    const x = centerX + a * Math.cos(angle) - 22;
-    const y = centerY + b * Math.sin(angle) - 22;
+    // Place seat exactly on the SVG ellipse edge
+    const x = centerX + a * Math.cos(angle) - seatWidth / 2;
+    const y = centerY + b * Math.sin(angle) - seatHeight / 2;
     let seat;
     // Apply .dealer class to the correct seat
     let isDealer = (i === localDealerSeat);
@@ -142,17 +143,16 @@ function renderTable() {
       seat.style.left = x + 'px';
       seat.style.top = y + 'px';
     }
-    // No seat number text
+    seatsLayer.appendChild(seat);
     if (i === localDealerSeat && i !== playerPosIdx) {
       const btn = document.createElement('div');
       btn.className = 'dealer-btn';
       btn.innerText = 'D';
       seat.appendChild(btn);
     }
-    container.appendChild(seat);
 
     // Place a single chip in front of the SB (seat after dealer), 1/4 of the way from seat to center
-  if (i === (localDealerSeat + 1) % NUM_SEATS) {
+      if (i === (localDealerSeat + 1) % NUM_SEATS) {
       const chipAngle = playerAngle + (2 * Math.PI / NUM_SEATS) * ((i - PLAYER_SEAT + NUM_SEATS) % NUM_SEATS);
       // Seat position
       const seatX = centerX + a * Math.cos(chipAngle);
@@ -168,10 +168,10 @@ function renderTable() {
       chip.style.left = chipX + 'px';
       chip.style.top = chipY + 'px';
       chip.innerText = '1';
-      container.appendChild(chip);
+        seatsLayer.appendChild(chip);
     }
     // Place a big blind chip in front of the BB (2 seats after dealer), 1/4 of the way from seat to center
-  if (i === (localDealerSeat + 2) % NUM_SEATS) {
+      if (i === (localDealerSeat + 2) % NUM_SEATS) {
       const chipAngle = playerAngle + (2 * Math.PI / NUM_SEATS) * ((i - PLAYER_SEAT + NUM_SEATS) % NUM_SEATS);
       // Seat position
       const seatX = centerX + a * Math.cos(chipAngle);
@@ -187,7 +187,7 @@ function renderTable() {
       chip.style.left = chipX + 'px';
       chip.style.top = chipY + 'px';
       chip.innerText = '2';
-      container.appendChild(chip);
+        seatsLayer.appendChild(chip);
     }
 
     // Only show position label in front of player seat
@@ -202,7 +202,7 @@ function renderTable() {
       // Always show the POSITIONS abbreviation for the player seat
       let posIdx = (playerPosIdx - localDealerSeat + NUM_SEATS) % NUM_SEATS;
       label.innerText = POSITIONS[posIdx];
-      container.appendChild(label);
+    seatsLayer.appendChild(label);
     }
   }
 }
@@ -211,7 +211,14 @@ function moveDealer() {
     // In drill mode, just deal new cards
     renderTable();
   } else {
-    dealerSeat = (dealerSeat + 1) % NUM_SEATS;
+    // In ring mode, skip SB and BB positions
+    do {
+      dealerSeat = (dealerSeat + 1) % NUM_SEATS;
+      // Calculate the player's position label for this seat
+      const playerPosIdx = PLAYER_SEAT;
+      const posIdx = (playerPosIdx - dealerSeat + NUM_SEATS) % NUM_SEATS;
+      var posLabel = POSITIONS[posIdx];
+    } while (posLabel === 'SB' || posLabel === 'BB');
     renderTable();
   }
 }
