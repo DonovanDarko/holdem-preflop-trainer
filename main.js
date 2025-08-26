@@ -72,23 +72,40 @@ function showFeedback(isCorrect, pos) {
   const title = document.getElementById('feedbackTitle');
   const rangeImgDiv = document.getElementById('rangeImageContainer');
   overlay.style.display = 'flex';
+  overlay.style.pointerEvents = 'auto';
+  overlay.style.opacity = '1';
   title.textContent = isCorrect ? 'Correct!' : 'Incorrect :('; 
   rangeImgDiv.style.display = 'none';
   rangeImgDiv.innerHTML = '';
   // Next Hand button
   document.getElementById('nextHandBtn').onclick = () => {
     overlay.style.display = 'none';
+    overlay.style.pointerEvents = 'none';
+    overlay.style.opacity = '0';
     moveDealer();
   };
-  // Show Range button
-  document.getElementById('showRangeBtn').onclick = () => {
-    // Map pos to image file
-    const posMap = {
-      'Dealer': 'BTN', 'BTN': 'BTN', 'CO': 'CO', 'CU': 'CO', 'HJ': 'HJ', 'LJ': 'LJ', 'MP': 'MP', 'UTG': 'UTG', 'UTG +1': 'UTG1'
-    };
-    const imgName = posMap[pos] || 'BTN';
-    rangeImgDiv.innerHTML = `<img src="assets/ranges/${imgName}.PNG" alt="${imgName} range" />`;
-    rangeImgDiv.style.display = 'block';
+  // Show Range/Table toggle button
+  const showTableBtn = document.getElementById('showRangeBtn');
+  showTableBtn.textContent = 'Show Range';
+  let showingRange = false;
+  showTableBtn.onclick = () => {
+    if (!showingRange) {
+      // Show range image
+      const posMap = {
+        'Dealer': 'BTN', 'BTN': 'BTN', 'CO': 'CO', 'CU': 'CO', 'HJ': 'HJ', 'LJ': 'LJ', 'MP': 'MP', 'UTG': 'UTG', 'UTG +1': 'UTG1'
+      };
+      const imgName = posMap[pos] || 'BTN';
+      rangeImgDiv.innerHTML = `<img src="assets/ranges/${imgName}.PNG" alt="${imgName} range" />`;
+      rangeImgDiv.style.display = 'block';
+      showTableBtn.textContent = 'Show Table';
+      showingRange = true;
+    } else {
+      // Show table/cards again
+      rangeImgDiv.style.display = 'none';
+      rangeImgDiv.innerHTML = '';
+      showTableBtn.textContent = 'Show Range';
+      showingRange = false;
+    }
   };
 }
 
@@ -149,7 +166,7 @@ function renderTable() {
     let seat;
     // Apply .dealer class to the correct seat
     let isDealer = (i === localDealerSeat);
-    if (i === playerPosIdx) {
+  if (i === playerPosIdx) {
       // Draw two random cards for the player
       const suits = [
         { symbol: '♥', color: 'red' },
@@ -171,65 +188,106 @@ function renderTable() {
       const card2Index = Math.floor(Math.random() * deck.length);
       const card2 = deck.splice(card2Index, 1)[0];
 
-      // Create a transparent seat for positioning
-  seat = document.createElement('div');
-  seat.className = isDealer ? 'dealer' : '';
-  seat.style.position = 'absolute';
-  seat.style.left = x + 'px';
-  seat.style.top = y + 'px';
-  seat.style.width = '0px';
-  seat.style.height = '0px';
-  seat.style.zIndex = 300;
+    // Store for checking answer
+    window.currentHand = [card1, card2];
 
-      // Card container absolutely positioned over the seat
-      const cardContainer = document.createElement('div');
-  cardContainer.className = 'player-cards';
-  cardContainer.style.position = 'absolute';
-  cardContainer.style.left = '-38px'; // move more centered
-  cardContainer.style.top = '-45px'; // move up
-  cardContainer.style.display = 'flex';
-  cardContainer.style.flexDirection = 'row';
-  cardContainer.style.alignItems = 'center';
-  cardContainer.style.justifyContent = 'center';
-  cardContainer.style.zIndex = 300;
+    // Create a transparent seat for positioning
+    seat = document.createElement('div');
+    seat.className = isDealer ? 'dealer' : '';
+    seat.style.position = 'absolute';
+    seat.style.left = x + 'px';
+    seat.style.top = y + 'px';
+    seat.style.width = '0px';
+    seat.style.height = '0px';
+    seat.style.zIndex = 300;
 
-  // Card 1
-  const card1Div = document.createElement('div');
-  card1Div.style.width = '58px';
-  card1Div.style.height = '84px';
-  card1Div.style.background = '#fff';
-  card1Div.style.borderRadius = '7px';
-  card1Div.style.border = '2px solid #222';
-  card1Div.style.display = 'flex';
-  card1Div.style.flexDirection = 'column';
-  card1Div.style.alignItems = 'center';
-  card1Div.style.justifyContent = 'center';
-  card1Div.style.margin = '0 3px';
-  card1Div.style.fontSize = '2.2rem';
-  card1Div.style.boxShadow = '0 2px 8px #0005';
-  card1Div.style.padding = '4px 0 0 0';
-  card1Div.innerHTML = `<span style="color:${card1.color};font-size:1.1em;line-height:1;">${card1.rank}</span><span style="color:${card1.color};font-size:0.95em;line-height:1;">${card1.suit}</span>`;
+    // Card container absolutely positioned over the seat
+    const cardContainer = document.createElement('div');
+    cardContainer.className = 'player-cards';
+    cardContainer.style.position = 'absolute';
+    cardContainer.style.left = '-38px'; // move more centered
+    cardContainer.style.top = '-45px'; // move up
+    cardContainer.style.display = 'flex';
+    cardContainer.style.flexDirection = 'row';
+    cardContainer.style.alignItems = 'center';
+    cardContainer.style.justifyContent = 'center';
+    cardContainer.style.zIndex = 300;
 
-  // Card 2
-  const card2Div = document.createElement('div');
-  card2Div.style.width = '58px';
-  card2Div.style.height = '84px';
-  card2Div.style.background = '#fff';
-  card2Div.style.borderRadius = '7px';
-  card2Div.style.border = '2px solid #222';
-  card2Div.style.display = 'flex';
-  card2Div.style.flexDirection = 'column';
-  card2Div.style.alignItems = 'center';
-  card2Div.style.justifyContent = 'center';
-  card2Div.style.margin = '0 3px';
-  card2Div.style.fontSize = '2.2rem';
-  card2Div.style.boxShadow = '0 2px 8px #0005';
-  card2Div.style.padding = '4px 0 0 0';
-  card2Div.innerHTML = `<span style="color:${card2.color};font-size:1.1em;line-height:1;">${card2.rank}</span><span style="color:${card2.color};font-size:0.95em;line-height:1;">${card2.suit}</span>`;
+    // Card 1
+    const card1Div = document.createElement('div');
+    card1Div.style.width = '58px';
+    card1Div.style.height = '84px';
+    card1Div.style.background = '#fff';
+    card1Div.style.borderRadius = '7px';
+    card1Div.style.border = '2px solid #222';
+    card1Div.style.display = 'flex';
+    card1Div.style.flexDirection = 'column';
+    card1Div.style.alignItems = 'center';
+    card1Div.style.justifyContent = 'center';
+    card1Div.style.margin = '0 3px';
+    card1Div.style.fontSize = '2.2rem';
+    card1Div.style.boxShadow = '0 2px 8px #0005';
+    card1Div.style.padding = '4px 0 0 0';
+    card1Div.innerHTML = `<span style=\"color:${card1.color};font-size:1.1em;line-height:1;\">${card1.rank}</span><span style=\"color:${card1.color};font-size:0.95em;line-height:1;\">${card1.suit}</span>`;
 
-  cardContainer.appendChild(card1Div);
-  cardContainer.appendChild(card2Div);
-  seat.appendChild(cardContainer);
+    // Card 2
+    const card2Div = document.createElement('div');
+    card2Div.style.width = '58px';
+    card2Div.style.height = '84px';
+    card2Div.style.background = '#fff';
+    card2Div.style.borderRadius = '7px';
+    card2Div.style.border = '2px solid #222';
+    card2Div.style.display = 'flex';
+    card2Div.style.flexDirection = 'column';
+    card2Div.style.alignItems = 'center';
+    card2Div.style.justifyContent = 'center';
+    card2Div.style.margin = '0 3px';
+    card2Div.style.fontSize = '2.2rem';
+    card2Div.style.boxShadow = '0 2px 8px #0005';
+    card2Div.style.padding = '4px 0 0 0';
+    card2Div.innerHTML = `<span style=\"color:${card2.color};font-size:1.1em;line-height:1;\">${card2.rank}</span><span style=\"color:${card2.color};font-size:0.95em;line-height:1;\">${card2.suit}</span>`;
+
+    cardContainer.appendChild(card1Div);
+    cardContainer.appendChild(card2Div);
+    seat.appendChild(cardContainer);
+
+    // Add Raise/Fold buttons
+    const actionDiv = document.createElement('div');
+    actionDiv.style.display = 'flex';
+    actionDiv.style.justifyContent = 'center';
+    actionDiv.style.marginTop = '1.2rem';
+    actionDiv.style.gap = '1.2rem';
+    actionDiv.style.zIndex = 301;
+
+    const raiseBtn = document.createElement('button');
+    raiseBtn.textContent = 'Raise';
+    raiseBtn.style.padding = '0.7rem 2.2rem';
+    raiseBtn.style.fontSize = '1.2rem';
+    raiseBtn.style.background = '#388e3c';
+    raiseBtn.style.color = '#fff';
+    raiseBtn.style.border = 'none';
+    raiseBtn.style.borderRadius = '8px';
+    raiseBtn.style.cursor = 'pointer';
+    raiseBtn.style.fontWeight = 'bold';
+
+    const foldBtn = document.createElement('button');
+    foldBtn.textContent = 'Fold';
+    foldBtn.style.padding = '0.7rem 2.2rem';
+    foldBtn.style.fontSize = '1.2rem';
+    foldBtn.style.background = '#d32f2f';
+    foldBtn.style.color = '#fff';
+    foldBtn.style.border = 'none';
+    foldBtn.style.borderRadius = '8px';
+    foldBtn.style.cursor = 'pointer';
+    foldBtn.style.fontWeight = 'bold';
+
+    actionDiv.appendChild(raiseBtn);
+    actionDiv.appendChild(foldBtn);
+    seat.appendChild(actionDiv);
+
+    // Button logic
+    raiseBtn.onclick = () => handleAction('raise');
+    foldBtn.onclick = () => handleAction('fold');
     } else {
       seat = document.createElement('div');
       seat.className = 'seat' + (isDealer ? ' dealer' : '');
@@ -286,7 +344,7 @@ function renderTable() {
     // Only show position label in front of player seat
     if (i === playerPosIdx) {
       const label = document.createElement('div');
-      label.className = 'position-label';
+  label.className = 'position-label player-label';
       const btnRadius = b + 40;
       const btnX = centerX + a * Math.cos(angle) - 35;
       const btnY = centerY + btnRadius * Math.sin(angle) - 16;
@@ -347,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function showTable() {
     home.style.display = 'none';
     tableContainer.style.display = '';
-    nextBtn.style.display = '';
+  nextBtn.style.display = 'none';
     posSelect.style.display = 'none';
     mainTitle.style.display = '';
     renderTable();

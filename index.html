@@ -49,18 +49,19 @@
     <div id="seatsLayer" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;"></div>
   </div>
   <button id="nextBtn" style="display:none;margin-top:1rem;padding:0.5rem 1.2rem;font-size:1rem;">Next Dealer</button>
-  <script type="module" src="main.js"></script>
-</body>
 
-  <!-- Feedback Overlay -->
-  <div id="feedbackOverlay" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;flex-direction:column;">
-    <div id="feedbackBox" style="background:#222;padding:2rem 2.5rem;border-radius:1.2rem;box-shadow:0 4px 32px #000a;text-align:center;max-width:90vw;">
-      <h2 id="feedbackTitle" style="color:#fff;margin-bottom:1.2rem;">Correct!</h2>
+  <!-- Feedback Overlay (moved inside body for stacking) -->
+  <div id="feedbackOverlay">
+    <div id="feedbackBox">
+      <h2 id="feedbackTitle">Correct!</h2>
       <div style="margin-bottom:1.5rem;">
-        <button id="nextHandBtn" style="margin:0 0.7rem 0 0;padding:0.6rem 1.5rem;font-size:1.1rem;">Next Hand</button>
-        <button id="showRangeBtn" style="padding:0.6rem 1.5rem;font-size:1.1rem;">Show range</button>
+        <button id="nextHandBtn">Next Hand</button>
+        <button id="showRangeBtn">Show range</button>
       </div>
-      <div id="rangeImageContainer" style="display:none;margin-top:1.2rem;"></div>
+      <div id="rangeImageContainer"></div>
     </div>
   </div>
+
+  <script type="module" src="main.js"></script>
+</body>
 </html>
