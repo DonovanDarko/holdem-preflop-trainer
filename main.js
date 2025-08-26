@@ -1,3 +1,96 @@
+// --- FEEDBACK LOGIC ---
+import * as RANGES from './ranges.js';
+
+function getPlayerPosition() {
+  // Returns the position string for the player seat
+  let posIdx;
+  if (mode === 'drill' && drillPosition) {
+    // Map DRILL_POSITIONS to POSITIONS index
+    const drillToPositionsIdx = {
+      'Dealer': 0,
+      'Cutoff': 8, // CU
+      'Hi-Jack': 7, // HJ
+      'Lo-Jack': 6, // LJ
+      'Middle Position': 5, // MP
+      'Under the Gun +1': 4, // UTG +1
+      'Under the Gun': 3 // UTG
+    };
+    posIdx = drillToPositionsIdx[drillPosition];
+  } else {
+    const playerPosIdx = PLAYER_SEAT;
+    posIdx = (playerPosIdx - dealerSeat + NUM_SEATS) % NUM_SEATS;
+  }
+  return POSITIONS[posIdx];
+}
+
+function handToString(card1, card2) {
+  // Returns hand string like 'AKs', 'QJo', '77', etc.
+  const rankOrder = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
+  let r1 = card1.rank, r2 = card2.rank;
+  let s1 = card1.suit, s2 = card2.suit;
+  if (rankOrder.indexOf(r2) < rankOrder.indexOf(r1)) {
+    [r1, r2] = [r2, r1];
+    [s1, s2] = [s2, s1];
+  }
+  if (r1 === r2) return r1 + r2;
+  const suited = s1 === s2 ? 's' : 'o';
+  return r1 + r2 + suited;
+}
+
+function getRangeForPosition(pos) {
+  // Map position to range array from RANGES
+  switch (pos) {
+    case 'UTG': return RANGES.UTG;
+    case 'UTG +1': return RANGES.UTG1;
+    case 'MP': return RANGES.MP;
+    case 'LJ': return RANGES.LJ;
+    case 'HJ': return RANGES.HJ;
+    case 'CO': return RANGES.CO;
+    case 'CU': return RANGES.CO;
+    case 'Dealer': return RANGES.BTN;
+    case 'BTN': return RANGES.BTN;
+    default: return RANGES.BTN;
+  }
+}
+
+function handleAction(action) {
+  const [card1, card2] = window.currentHand;
+  const pos = getPlayerPosition();
+  const handStr = handToString(card1, card2);
+  const range = getRangeForPosition(pos);
+  let correct = false;
+  if (action === 'raise') {
+    correct = range.includes(handStr);
+  } else if (action === 'fold') {
+    correct = !range.includes(handStr);
+  }
+  showFeedback(correct, pos);
+}
+
+function showFeedback(isCorrect, pos) {
+  const overlay = document.getElementById('feedbackOverlay');
+  const title = document.getElementById('feedbackTitle');
+  const rangeImgDiv = document.getElementById('rangeImageContainer');
+  overlay.style.display = 'flex';
+  title.textContent = isCorrect ? 'Correct!' : 'Incorrect :('; 
+  rangeImgDiv.style.display = 'none';
+  rangeImgDiv.innerHTML = '';
+  // Next Hand button
+  document.getElementById('nextHandBtn').onclick = () => {
+    overlay.style.display = 'none';
+    moveDealer();
+  };
+  // Show Range button
+  document.getElementById('showRangeBtn').onclick = () => {
+    // Map pos to image file
+    const posMap = {
+      'Dealer': 'BTN', 'BTN': 'BTN', 'CO': 'CO', 'CU': 'CO', 'HJ': 'HJ', 'LJ': 'LJ', 'MP': 'MP', 'UTG': 'UTG', 'UTG +1': 'UTG1'
+    };
+    const imgName = posMap[pos] || 'BTN';
+    rangeImgDiv.innerHTML = `<img src="assets/ranges/${imgName}.PNG" alt="${imgName} range" />`;
+    rangeImgDiv.style.display = 'block';
+  };
+}
 
 const NUM_SEATS = 9;
 const PLAYER_SEAT = 8; // fixed player seat at bottom
