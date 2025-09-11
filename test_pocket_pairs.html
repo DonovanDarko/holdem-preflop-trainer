@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Pocket Pairs</title>
+</head>
+<body>
+    <h1>Testing Pocket Pairs in MP Range</h1>
+    <div id="results"></div>
+    <script type="module">
+        import * as RANGES from './ranges.js';
+        
+        // Test handToString function
+        function handToString(card1, card2) {
+            const rankOrder = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
+            let r1 = card1.rank, r2 = card2.rank;
+            let s1 = card1.suit, s2 = card2.suit;
+            if (rankOrder.indexOf(r2) < rankOrder.indexOf(r1)) {
+                [r1, r2] = [r2, r1];
+                [s1, s2] = [s2, s1];
+            }
+            if (r1 === r2) return r1 + r2;
+            const suited = s1 === s2 ? 's' : 'o';
+            return r1 + r2 + suited;
+        }
+        
+        const results = document.getElementById('results');
+        
+        // Test pocket threes
+        const pocket3s = [
+            { rank: '3', suit: '♠' },
+            { rank: '3', suit: '♥' }
+        ];
+        
+        const handStr = handToString(pocket3s[0], pocket3s[1]);
+        results.innerHTML += `<p>Pocket threes hand string: ${handStr}</p>`;
+        results.innerHTML += `<p>MP range includes 33: ${RANGES.MP.includes(handStr)}</p>`;
+        
+        // Test other small pocket pairs
+        const testPairs = ['22', '33', '44', '55', '66'];
+        testPairs.forEach(pair => {
+            const inRange = RANGES.MP.includes(pair);
+            results.innerHTML += `<p>${pair} in MP range: ${inRange}</p>`;
+            console.log(`${pair} in MP range:`, inRange);
+        });
+        
+        console.log('Full MP range:', RANGES.MP);
+    </script>
+</body>
+</html>
