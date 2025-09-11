@@ -72,7 +72,7 @@ export const LJ = [
 ];
 
 export const MP = [
-  "AA", "KK", "QQ", "JJ", "TT", "99", "88", "77", "66", "55", "44", "33", "22",
+  "AA", "KK", "QQ", "JJ", "TT", "99", "88", "77",
   "AKs", "AQs", "AJs", "ATs", "A9s", "A5s", "A4s", "A3s",
   "KQs", "KJs", "KTs",
   "QJs", "QTs", "Q9s",
