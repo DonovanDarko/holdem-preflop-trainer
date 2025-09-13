@@ -204,11 +204,24 @@ function renderTable() {
     // Correct formula: rotate so POSITIONS[PLAYER_SEAT] === drillPosition
     localDealerSeat = (PLAYER_SEAT - drillIdx + NUM_SEATS) % NUM_SEATS;
   }
-  // SVG oval params (match ellipse in SVG): cx=190, cy=280, rx=170, ry=250
-  const a = 170; // horizontal radius
-  const b = 250; // vertical radius
-  const centerX = 190;
-  const centerY = 280;
+  // Get actual container dimensions for responsive positioning
+  const containerRect = container.getBoundingClientRect();
+  const actualWidth = containerRect.width;
+  const actualHeight = containerRect.height;
+  
+  // SVG viewBox dimensions
+  const svgWidth = 380;
+  const svgHeight = 560;
+  
+  // Calculate scale factors
+  const scaleX = actualWidth / svgWidth;
+  const scaleY = actualHeight / svgHeight;
+  
+  // Scale SVG oval params to actual container size
+  const a = 170 * scaleX; // horizontal radius
+  const b = 250 * scaleY; // vertical radius
+  const centerX = 190 * scaleX;
+  const centerY = 280 * scaleY;
   const seatWidth = 44;
   const seatHeight = 44;
   const playerAngle = Math.PI / 2;
