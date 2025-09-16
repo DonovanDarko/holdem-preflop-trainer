@@ -172,7 +172,11 @@ let drillPosition = null;
 let correctCount = 0;
 let totalCount = 0;
 
-function renderTable() {
+// Store game state globally
+let currentHand = null;
+let currentSeatPositions = [];
+
+function renderTableGame() {
   const container = document.getElementById('tableContainer');
   const seatsLayer = document.getElementById('seatsLayer') || document.getElementById('tableContainer');
   // Remove old seats, chips, dealer buttons, position labels, player cards, and action buttons
@@ -204,25 +208,31 @@ function renderTable() {
     // Correct formula: rotate so POSITIONS[PLAYER_SEAT] === drillPosition
     localDealerSeat = (PLAYER_SEAT - drillIdx + NUM_SEATS) % NUM_SEATS;
   }
-  // SVG oval params (match ellipse in SVG): cx=190, cy=280, rx=170, ry=250
-  const a = 170; // horizontal radius
-  const b = 250; // vertical radius
-  const centerX = 190;
-  const centerY = 280;
+  // Dynamically get SVG/table size for responsive seat placement
+  const svg = document.getElementById('tableSVG');
+  const rect = svg.getBoundingClientRect();
+  // Use the SVG's viewBox values to scale radii
+  const viewBox = svg.getAttribute('viewBox').split(' ');
+  const vbWidth = parseFloat(viewBox[2]);
+  const vbHeight = parseFloat(viewBox[3]);
+  // These are the ellipse's rx/ry in the SVG
+  const ellipseRx = 170;
+  const ellipseRy = 250;
+  // Scale radii to actual rendered size
+  const a = rect.width * (ellipseRx / vbWidth);
+  const b = rect.height * (ellipseRy / vbHeight);
+  const centerX = rect.width * (190 / vbWidth);
+  const centerY = rect.height * (280 / vbHeight);
   const seatWidth = 44;
   const seatHeight = 44;
   const playerAngle = Math.PI / 2;
   for (let i = 0; i < NUM_SEATS; i++) {
-    // Player seat is always at the bottom center
-    let x, y;
-    if (i === PLAYER_SEAT) {
-      x = centerX - seatWidth / 2;
-      y = centerY + b - seatHeight / 2;
-    } else {
-      const angle = playerAngle + (2 * Math.PI / NUM_SEATS) * ((i - PLAYER_SEAT + NUM_SEATS) % NUM_SEATS);
-      x = centerX + a * Math.cos(angle) - seatWidth / 2;
-      y = centerY + b * Math.sin(angle) - seatHeight / 2;
-    }
+  // Player seat is always at the bottom center
+  let x, y;
+  const angle = playerAngle + (2 * Math.PI / NUM_SEATS) * ((i - PLAYER_SEAT + NUM_SEATS) % NUM_SEATS);
+  x = centerX + a * Math.cos(angle) - seatWidth / 2;
+  y = centerY + b * Math.sin(angle) - seatHeight / 2;
+
   let seat;
   // Determine seat type
   let isDealer = (i === localDealerSeat);
@@ -481,8 +491,10 @@ function moveDealer() {
     renderTable();
   }
 }
+function renderTable() {
+  renderTableGame();
+}
 window.renderTable = renderTable;
-window.moveDealer = moveDealer;
 
 // UI logic for home page and mode switching
 document.addEventListener('DOMContentLoaded', () => {
@@ -550,3 +562,59 @@ document.addEventListener('DOMContentLoaded', () => {
   nextBtn.onclick = moveDealer;
   showHome();
 });
+
+// On new hand, call renderTableGame()
+// On resize, only update layout
+let resizeTimeout;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    const tableContainer = document.getElementById('tableContainer');
+    if (tableContainer && tableContainer.style.display !== 'none') {
+      renderTableLayout();
+    }
+  }, 20);
+});
+
+function renderTableLayout() {
+  // Dynamically get SVG/table size for responsive seat placement
+  const svg = document.getElementById('tableSVG');
+  const rect = svg.getBoundingClientRect();
+  const viewBox = svg.getAttribute('viewBox').split(' ');
+  const vbWidth = parseFloat(viewBox[2]);
+  const vbHeight = parseFloat(viewBox[3]);
+  const ellipseRx = 170;
+  const ellipseRy = 250;
+  const a = rect.width * (ellipseRx / vbWidth);
+  const b = rect.height * (ellipseRy / vbHeight);
+  const centerX = rect.width * (190 / vbWidth);
+  const centerY = rect.height * (280 / vbHeight);
+  const seatWidth = 44;
+  const seatHeight = 44;
+  const playerAngle = Math.PI / 2;
+  // Update positions for all seats
+  const seats = document.querySelectorAll('.seat');
+  seats.forEach((seat, i) => {
+    const angle = playerAngle + (2 * Math.PI / seats.length) * ((i - 8 + seats.length) % seats.length);
+    const x = centerX + a * Math.cos(angle) - seatWidth / 2;
+    const y = centerY + b * Math.sin(angle) - seatHeight / 2;
+    seat.style.left = x + 'px';
+    seat.style.top = y + 'px';
+  });
+  // Update positions for player cards
+  const cardContainers = document.querySelectorAll('.player-cards');
+  cardContainers.forEach((container, i) => {
+    const angle = playerAngle + (2 * Math.PI / cardContainers.length) * ((i - 8 + cardContainers.length) % cardContainers.length);
+    const x = centerX + a * Math.cos(angle);
+    const y = centerY + b * Math.sin(angle) - 60;
+    container.style.left = x + 'px';
+    container.style.top = y + 'px';
+    container.style.transform = 'translate(-50%, 0)';
+  });
+  // Update positions for chips
+  const chips = document.querySelectorAll('.chip');
+  chips.forEach((chip, i) => {
+    // You may need to store chip seat index for more accurate placement
+    chip.style.zIndex = 100;
+  });
+}
