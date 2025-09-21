@@ -274,7 +274,23 @@ function renderTableGame() {
       seat.style.height = seatHeight + 'px';
       seat.style.zIndex = 300;
       // Only add dealer button for dealer seat
-      if (isDealer) {
+      // Player seat identifier logic
+      if (i === playerPosIdx) {
+        if (isDealer) {
+          // Player is dealer: gold dealer button with 'You'
+          const dealerLabel = document.createElement('div');
+          dealerLabel.className = 'dealer-btn';
+          dealerLabel.innerText = 'You';
+          seat.appendChild(dealerLabel);
+        } else {
+          // Player seat: purple button with 'You'
+          const playerLabel = document.createElement('div');
+          playerLabel.className = 'player-btn';
+          playerLabel.innerText = 'You';
+          seat.appendChild(playerLabel);
+        }
+      } else if (isDealer) {
+        // Non-player dealer seat: gold dealer button
         const dealerLabel = document.createElement('div');
         dealerLabel.className = 'dealer-btn';
         dealerLabel.innerText = 'D';
@@ -512,6 +528,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const posSelect = document.getElementById('position-select');
   const backHomeBtn = document.getElementById('backHomeBtn');
   const mainTitle = document.getElementById('main-title');
+    const gameBackBtn = document.getElementById('gameBackBtn');
 
   function showHome() {
     mode = 'home';
@@ -520,6 +537,7 @@ document.addEventListener('DOMContentLoaded', () => {
     nextBtn.style.display = 'none';
     posSelect.style.display = 'none';
     mainTitle.style.display = '';
+      if (gameBackBtn) gameBackBtn.style.display = 'none';
   }
 
   function showTable() {
@@ -527,7 +545,8 @@ document.addEventListener('DOMContentLoaded', () => {
     tableContainer.style.display = '';
     nextBtn.style.display = 'none';
     posSelect.style.display = 'none';
-    mainTitle.style.display = '';
+      mainTitle.style.display = 'none';
+      if (gameBackBtn) gameBackBtn.style.display = '';
     renderTable();
   }
 
@@ -536,13 +555,15 @@ document.addEventListener('DOMContentLoaded', () => {
     tableContainer.style.display = 'none';
     nextBtn.style.display = 'none';
     posSelect.style.display = 'flex';
-    mainTitle.style.display = '';
+      mainTitle.style.display = '';
+      if (gameBackBtn) gameBackBtn.style.display = 'none';
   }
 
   drillBtn.onclick = () => {
     showPositionSelect();
   };
   ringBtn.onclick = () => {
+    resetGameState();
     mode = 'ring';
     dealerSeat = 0;
     playerSeat = 8;
@@ -550,8 +571,17 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   backHomeBtn.onclick = showHome;
 
+    // Back arrow in game screen: go home and reset score/counter
+    if (gameBackBtn) {
+      gameBackBtn.onclick = () => {
+        resetGameState();
+        showHome();
+      };
+    }
+
   Array.from(document.getElementsByClassName('pos-btn')).forEach(btn => {
     btn.onclick = () => {
+      resetGameState();
       drillPosition = btn.getAttribute('data-pos');
       mode = 'drill';
       dealerSeat = 0;
@@ -617,4 +647,24 @@ function renderTableLayout() {
     // You may need to store chip seat index for more accurate placement
     chip.style.zIndex = 100;
   });
+}
+
+function resetGameState() {
+  // Remove lingering feedback/action buttons
+  const tableContainer = document.getElementById('tableContainer');
+  if (tableContainer) {
+    const oldFeedback = document.getElementById('centerFeedback');
+    if (oldFeedback) oldFeedback.remove();
+    Array.from(tableContainer.querySelectorAll('div')).forEach(div => {
+      const btns = div.querySelectorAll('button');
+      if (btns.length === 2 && (btns[0].textContent.match(/Next Hand|Raise/) || btns[1].textContent.match(/Show Range|Fold/))) {
+        div.remove();
+      }
+    });
+  }
+  correctCount = 0;
+  totalCount = 0;
+  drillPosition = null;
+  dealerSeat = 0;
+  playerSeat = 8;
 }

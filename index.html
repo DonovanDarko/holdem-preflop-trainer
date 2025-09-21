@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,7 +23,8 @@
   <link rel="manifest" href="assets/favicon/site.webmanifest">
 </head>
 <body>
-  <h2 id="main-title">Hold 'Em RFI Trainer</h2>
+  <!-- Title -->
+  <h2 id="main-title">Hold 'Em Preflop Trainer</h2>
   <div id="home" style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 2rem; position: relative; min-height: 600px;">
     <svg id="homeTableSVG" width="100%" height="100%" viewBox="0 0 380 560" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1;max-width:380px;max-height:560px;">
       <ellipse cx="190" cy="280" rx="170" ry="250" fill="#2e8b57" stroke="#1976d2" stroke-width="8" filter="url(#shadow)"/>
@@ -42,18 +42,19 @@
   </div>
   <div id="position-select" style="display:none; flex-direction: column; align-items: center; margin-top: 2rem;">
     <h3>Select Position</h3>
-    <div style="display: flex; flex-direction: column; gap: 0.7rem;">
-      <button class="pos-btn" data-pos="Dealer">Dealer</button>
-      <button class="pos-btn" data-pos="Cutoff">Cutoff</button>
-      <button class="pos-btn" data-pos="Hi-Jack">Hi-Jack</button>
-      <button class="pos-btn" data-pos="Lo-Jack">Lo-Jack</button>
-      <button class="pos-btn" data-pos="Middle Position">Middle Position</button>
-      <button class="pos-btn" data-pos="Under the Gun +1">Under the Gun +1</button>
-      <button class="pos-btn" data-pos="Under the Gun">Under the Gun</button>
+    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+      <button class="pos-btn" data-pos="Dealer" style="margin: 0.5rem 0; padding: 0.7rem 1.2rem; font-size: 1.05rem; border-radius: 8px; border: none; background: #1976d2; color: #fff; font-weight: bold; box-shadow: 0 4px 18px #0008, 0 2px 6px #0002; cursor: pointer; width: 180px;">Dealer</button>
+      <button class="pos-btn" data-pos="Cutoff" style="margin: 0.5rem 0; padding: 0.7rem 1.2rem; font-size: 1.05rem; border-radius: 8px; border: none; background: #1976d2; color: #fff; font-weight: bold; box-shadow: 0 4px 18px #0008, 0 2px 6px #0002; cursor: pointer; width: 180px;">Cutoff</button>
+      <button class="pos-btn" data-pos="Hi-Jack" style="margin: 0.5rem 0; padding: 0.7rem 1.2rem; font-size: 1.05rem; border-radius: 8px; border: none; background: #1976d2; color: #fff; font-weight: bold; box-shadow: 0 4px 18px #0008, 0 2px 6px #0002; cursor: pointer; width: 180px;">Hi-Jack</button>
+      <button class="pos-btn" data-pos="Lo-Jack" style="margin: 0.5rem 0; padding: 0.7rem 1.2rem; font-size: 1.05rem; border-radius: 8px; border: none; background: #1976d2; color: #fff; font-weight: bold; box-shadow: 0 4px 18px #0008, 0 2px 6px #0002; cursor: pointer; width: 180px;">Lo-Jack</button>
+      <button class="pos-btn" data-pos="Middle Position" style="margin: 0.5rem 0; padding: 0.7rem 1.2rem; font-size: 1.05rem; border-radius: 8px; border: none; background: #1976d2; color: #fff; font-weight: bold; box-shadow: 0 4px 18px #0008, 0 2px 6px #0002; cursor: pointer; width: 180px;">Middle Position</button>
+      <button class="pos-btn" data-pos="Under the Gun +1" style="margin: 0.5rem 0; padding: 0.7rem 1.2rem; font-size: 1.05rem; border-radius: 8px; border: none; background: #1976d2; color: #fff; font-weight: bold; box-shadow: 0 4px 18px #0008, 0 2px 6px #0002; cursor: pointer; width: 180px;">Under the Gun +1</button>
+      <button class="pos-btn" data-pos="Under the Gun" style="margin: 0.5rem 0; padding: 0.7rem 1.2rem; font-size: 1.05rem; border-radius: 8px; border: none; background: #1976d2; color: #fff; font-weight: bold; box-shadow: 0 4px 18px #0008, 0 2px 6px #0002; cursor: pointer; width: 180px;">Under the Gun</button>
     </div>
-    <button id="backHomeBtn" style="margin-top:1.5rem;">Back</button>
+    <button id="backHomeBtn" style="margin-top:1.2rem; margin: 0.5rem 0; padding: 0.7rem 1.2rem; font-size: 1.05rem; border-radius: 8px; border: none; background: #888; color: #fff; font-weight: bold; box-shadow: 0 4px 18px #0008, 0 2px 6px #0002; cursor: pointer; width: 180px;">Back</button>
   </div>
   <div class="table-container" id="tableContainer" style="display:none;position:relative;width:380px;height:560px;">
+    <button id="gameBackBtn" style="display:none;position:absolute;top:18px;left:18px;width:38px;height:38px;background:rgba(0,0,0,0.7);border:none;border-radius:50%;color:#fff;font-size:1.7rem;z-index:999;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px #0006;">&#8592;</button>
     <svg id="tableSVG" width="100%" height="100%" viewBox="0 0 380 560" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;">
       <ellipse cx="190" cy="280" rx="170" ry="250" fill="#2e8b57" stroke="#1976d2" stroke-width="8" filter="url(#shadow)"/>
       <defs>
